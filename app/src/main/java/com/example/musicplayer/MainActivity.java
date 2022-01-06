@@ -31,7 +31,7 @@ public class MainActivity extends AppCompatActivity {
 
         for (int i = 0; i < 10; i++) {
             ListItem item = new ListItem(
-                    "item no. " + i + 1, "description"
+                    "Item No. " + (i + 1), "Description "+i
             );
             listItems.add(item);
         }
