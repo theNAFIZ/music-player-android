@@ -3,6 +3,7 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/AndroidStudioProjects/music-player-android/app/src/main/res/drawable/oval.xml" value="0.1" />
         <entry key="..\:/AndroidStudioProjects/music-player-android/app/src/main/res/layout/activity_details.xml" value="0.25" />
         <entry key="..\:/Users/nrahm/AndroidStudioProjects/MusicPlayer/app/src/main/res/layout/activity_main.xml" value="0.25" />
         <entry key="..\:/Users/nrahm/AndroidStudioProjects/MusicPlayer/app/src/main/res/layout/list_row.xml" value="0.25" />
