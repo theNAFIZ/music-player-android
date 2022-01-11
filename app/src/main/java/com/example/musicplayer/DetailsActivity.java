@@ -10,7 +10,10 @@ import android.widget.Button;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
-public class DetailsActivity extends AppCompatActivity {
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+public class DetailsActivity extends AppCompatActivity implements View.OnClickListener{
 
     private TextView name, description, startTimer, stopTimer;
     private Bundle extras;
@@ -39,6 +42,7 @@ public class DetailsActivity extends AppCompatActivity {
 
         mediaPlayer = new MediaPlayer();
         mediaPlayer =  MediaPlayer.create(getApplicationContext(), R.raw.whisle);
+        int duration = mediaPlayer.getDuration();
 
         seekBar = (SeekBar) findViewById(R.id.seekBar);
         startTimer = (TextView) findViewById(R.id.start_timer);
@@ -48,12 +52,15 @@ public class DetailsActivity extends AppCompatActivity {
         playButton = (Button) findViewById(R.id.playBtn);
         nextButton = (Button) findViewById(R.id.nextBtn);
 
+        stopTimer.setText(new SimpleDateFormat("mm:ss").format(duration));
         seekBar.setMax(mediaPlayer.getDuration());
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+                SimpleDateFormat dateFormat = new SimpleDateFormat("mm:ss");
+                int currentPosition = mediaPlayer.getCurrentPosition();
 
-                startTimer.setText(String.format("0:", String.valueOf(seekBar.getProgress() / 1000)));
+                startTimer.setText(dateFormat.format(new Date(currentPosition)));
             }
 
             @Override
@@ -67,8 +74,6 @@ public class DetailsActivity extends AppCompatActivity {
             }
         });
 
-        stopTimer.setText(String.format("0:%s", String.valueOf(mediaPlayer.getDuration() / 1000)));
-
         mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
             public void onCompletion(MediaPlayer mediaPlayer) {
@@ -76,44 +81,9 @@ public class DetailsActivity extends AppCompatActivity {
             }
         });
 
-        playButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (mediaPlayer.isPlaying()) {
-                    // pause music
-                    pauseMusic();
-                } else {
-                    // play music
-                    playMusic();
-                }
-            }
-        });
-
-        prevButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                int progress = seekBar.getProgress();
-                if(mediaPlayer != null) {
-                    progress-=5000;
-                    progress = Math.max(progress, 0);
-                    mediaPlayer.seekTo(progress);
-                    seekBar.setProgress(progress);
-                }
-            }
-        });
-
-        nextButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                int progress = seekBar.getProgress();
-                if(mediaPlayer != null) {
-                    progress+=5000;
-                    progress = Math.min(progress, mediaPlayer.getDuration());
-                    mediaPlayer.seekTo(progress);
-                    seekBar.setProgress(progress);
-                }
-            }
-        });
+        playButton.setOnClickListener(this);
+        prevButton.setOnClickListener(this);
+        nextButton.setOnClickListener(this);
 
     }
 
@@ -138,5 +108,39 @@ public class DetailsActivity extends AppCompatActivity {
             mediaPlayer = null;
         }
         super.onDestroy();
+    }
+
+    @Override
+    public void onClick(View view) {
+        int progress = mediaPlayer.getCurrentPosition();
+        switch (view.getId()) {
+            case R.id.prevBtn:
+                if(mediaPlayer != null) {
+                    progress-=5000;
+                    progress = Math.max(progress, 0);
+                    mediaPlayer.seekTo(progress);
+                    seekBar.setProgress(progress);
+                }
+                break;
+
+            case R.id.playBtn:
+                if (mediaPlayer.isPlaying()) {
+                    // pause music
+                    pauseMusic();
+                } else {
+                    // play music
+                    playMusic();
+                }
+                break;
+
+            case R.id.nextBtn:
+                if(mediaPlayer != null) {
+                    progress+=5000;
+                    progress = Math.min(progress, mediaPlayer.getDuration());
+                    mediaPlayer.seekTo(progress);
+                    seekBar.setProgress(progress);
+                }
+                break;
+        }
     }
 }
