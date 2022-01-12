@@ -17,9 +17,9 @@ public class DetailsActivity extends AppCompatActivity implements View.OnClickLi
 
     private TextView name, description, startTimer, stopTimer;
     private Bundle extras;
+    private Thread thread;
 
     // TODO: pass dynamic files to play
-    // TODO: design the player layout properly
 
     private MediaPlayer mediaPlayer;
     private Button prevButton;
@@ -97,6 +97,7 @@ public class DetailsActivity extends AppCompatActivity implements View.OnClickLi
     public void playMusic() {
         if (mediaPlayer != null) {
             mediaPlayer.start();
+            updateThread();
             playButton.setBackgroundResource(android.R.drawable.ic_media_pause);
         }
     }
@@ -106,6 +107,9 @@ public class DetailsActivity extends AppCompatActivity implements View.OnClickLi
         if (mediaPlayer != null && mediaPlayer.isPlaying()) {
             mediaPlayer.release();
             mediaPlayer = null;
+
+            thread.interrupt();
+            thread = null;
         }
         super.onDestroy();
     }
@@ -142,5 +146,31 @@ public class DetailsActivity extends AppCompatActivity implements View.OnClickLi
                 }
                 break;
         }
+    }
+
+    public void updateThread() {
+        thread = new Thread() {
+
+            @Override
+            public void run() {
+                try {
+                    while (mediaPlayer != null && mediaPlayer.isPlaying()) {
+                        Thread.sleep(50);
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                int newPosition = mediaPlayer.getCurrentPosition();
+                                seekBar.setProgress(newPosition);
+
+                                startTimer.setText(String.valueOf(new SimpleDateFormat("mm:ss").format(new Date(newPosition))));
+                            }
+                        });
+                    }
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        };
+        thread.start();
     }
 }
